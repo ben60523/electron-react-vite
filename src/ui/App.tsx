@@ -1,9 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const platforms = ['node', 'chrome', 'electron'];
+  const [count, setCount] = useState(0);
+  const [chromeVer, setChromeVer] = useState('');
+  const [nodeVer, setNodeVer] = useState('');
+  const [electronVer, setElectronVer] = useState('');
+
+  const onClickGetVersion = (platform: string) => {
+    window.ipcRenderer.loadVersion(platform).then((version) => {
+      if (platform === 'node') {
+        setNodeVer(version);
+      } else if (platform === 'electron') {
+        setElectronVer(version);
+      } else if (platform === 'chrome') {
+        setChromeVer(version);
+      }
+    });
+  };
+
+  const VersionComponent = (platform: string) => {
+    let version = '';
+    if (platform === 'node') {
+      version = nodeVer;
+    } else if (platform === 'electron') {
+      version = electronVer;
+    } else if (platform === 'chrome') {
+      version = chromeVer;
+    }
+    return (
+      <div key={platform}>
+        <div
+          style={{
+            display: 'inline-flex',
+            justifyContent: 'space-between',
+            padding: '5px',
+            width: '100%',
+          }}
+        >
+          <p style={{width: '30%', textAlign: 'left'}}>{platform}</p>
+          <button style={{width: '30%'}} key={platform} onClick={() => onClickGetVersion(platform)}>
+            GET
+          </button>
+          <p style={{width: '30%', textAlign: 'right'}}>{version}</p>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -24,8 +69,9 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more more
       </p>
+      {platforms.map((platform) => VersionComponent(platform))}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
